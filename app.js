@@ -1,4 +1,6 @@
-const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
+const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args)); // for JS api calls
+const nodeHtmlToImage = require('node-html-to-image'); // to convert HTML to an image
+
 const { Telegraf } = require('telegraf');
 const bot = new Telegraf('2022625702:AAF6rVOli5gxbedcAbhaldA8uyLU8HEosmA');
 // const COINMARKETCAP_API_KEY = '518451e4-2a6c-48b6-8b6e-a3c08ea4225f';
@@ -36,16 +38,37 @@ bot.hears(COMMANDS.price, (ctx) => {
             ctx.telegram.sendMessage(ctx.message.chat.id, `Sorry. Coingecko API did not response`);
             return;
         }
-        const text = generatePriceResponse(data[coinId], foundRecord);
-        ctx.telegram.sendMessage(ctx.message.chat.id, text, {parse_mode: 'Markdown'});
+        const htmlText = generatePriceResponse(data[coinId], foundRecord);
+        nodeHtmlToImage({
+            output: './image.png',
+            html: htmlText,
+            quality: 100,
+
+        })
+        .then(() => {
+            console.log('The image was created successfully!');
+            bot.telegram.sendPhoto(ctx.chat.id, {
+                source: 'image.png'
+            });
+        });
     });
 });
 
 function generatePriceResponse(data, coinData) {
-    // console.log(data);
-    // return `
-    //     *bold \*${data.name} - $${data.symbol}*
-    // `;
+    return `
+        <div style="width: 300px; height: 300px">
+            <b>${coinData.name} - $${coinData.symbol}</b>
+            <hr style="width: 100%">
+            
+        </div>
+    `;
+}
+
+function createElementFromHTML(htmlString) {
+    var div = document.createElement('div');
+    div.innerHTML = htmlString.trim();
+    // Change this to div.childNodes to support multiple top-level nodes
+    return div.firstChild; 
 }
 
 async function getAllCoingeckoCoins() {
