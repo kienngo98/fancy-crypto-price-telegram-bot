@@ -14,7 +14,7 @@ getAllCoingeckoCoins().then(data => {
 });
 
 const COMMANDS = {
-    price: new RegExp(/^\/v /), //>> "/va btc"
+    price: new RegExp(/^\/va /), //>> "/va btc"
     chart: new RegExp(/^\/chart /), // >> "/chart btc"
 }
 
@@ -54,30 +54,14 @@ bot.hears(COMMANDS.price, (ctx) => {
     });
 });
 
-function generatePriceResponse(data, coinData) {
-    return `
-        <div style="width: 300px; height: 300px">
-            <b>${coinData.name} - $${coinData.symbol}</b>
-            <hr style="width: 100%">
-            
-        </div>
-    `;
-}
-
-function createElementFromHTML(htmlString) {
-    var div = document.createElement('div');
-    div.innerHTML = htmlString.trim();
-    // Change this to div.childNodes to support multiple top-level nodes
-    return div.firstChild; 
-}
-
 async function getAllCoingeckoCoins() {
     return fetch('https://api.coingecko.com/api/v3/coins/list?include_platform=true').then(res => res.json());
 }
 
 async function getPriceFromCoinId(coinId, compareWithEth = true) {
-    const vsCurrencies = ['btc', 'usd'];
-    if (compareWithEth) vsCurrencies.push('eth');
+    const vsCurrencies = ['usd'];
+    if (coinId !== 'bitcoin') vsCurrencies.push('btc');
+    if (compareWithEth && coinId !== 'ethereum') vsCurrencies.push('eth');
     if (!coinId) {
         console.error('Missing coinId');
         return;
@@ -92,34 +76,85 @@ async function getPriceFromCoinId(coinId, compareWithEth = true) {
         `&include_last_updated_at=true`;
     return fetch(url).then(res => res.json());
 }
-bot.launch()
 
-/*
-<b>bold</b>, <strong>bold</strong>
-<i>italic</i>, <em>italic</em>
-<u>underline</u>, <ins>underline</ins>
-<s>strikethrough</s>, <strike>strikethrough</strike>, <del>strikethrough</del>
-<b>bold <i>italic bold <s>italic bold strikethrough</s> <u>underline italic bold</u></i> bold</b>
-<a href="http://www.example.com/">inline URL</a>
-<a href="tg://user?id=123456789">inline mention of a user</a>
-<code>inline fixed-width code</code>
-<pre>pre-formatted fixed-width code block</pre>
-<pre><code class="language-python">pre-formatted fixed-width code block written in the Python programming language</code></pre>
+function generatePriceResponse(data, coinData) {
+    const date = new Date();
+    const currentDate = date.toTimeString();
+    const getPriceAgainstBtc = () => {
+        if (!data.btc) return '';
+        return `
+            Price/BTC: ${data.btc} &#8383;
+        `;
+    }
+    const getPriceAgainstEthereum = () => {
+        if (!data.eth) return '';
+        return `
+            Price/ETH: ${data.eth} ♦
+        `;
+    }
+    return `
+        <html>
+        <head>
+            <style>
+                body {
+                    width: 300px;
+                    height: 300px;
+                }
+                #imageBody{
+                    width: 300px;
+                    height: 300px;
+                    display: flex;
+                    flex-direction: column;
+                    background-image: url("${getRandomBackgroundImage()}");
+                    background-position: center;
+                    background-repeat: no-repeat;
+                    background-size: cover;
+                }
+                #coinHeader {
+                    display: flex;
+                    text-align: center;
+                    font-size: 17px;
+                    background-color: violet;
+                }
+                #coinHeader > b {
+                    margin: auto;
+                }
+                #mainImageInfo {
+                    display: flex;
+                    flex-direction: column;
+                    text-align: center;
+                }
+                #mainImageInfo > div {
+                    background-color: white;
+                }
+                em {
+                    color: gray;
+                }
+                hr {
+                    width: 100%;
+                }
+            </style>
+            </head>
+            <body>
+                <div id="imageBody">
+                    <div id="coinHeader">
+                        <b>${coinData.name} - $${coinData.symbol.toUpperCase()}</b>
+                    </div>
+                    <div id="mainImageInfo">
+                        <em>Price updated at ${currentDate}</em>
+                        <hr>
+                        <div>Price/USD: $${data.usd}</div>
+                        <div>${getPriceAgainstBtc()}</div>
+                        <div>${getPriceAgainstEthereum()}</div>
 
+                    </div>
+                </div>
+            </body>
+        </html>
+    `;
+}
 
-
-*bold \*text*
-_italic \*text_
-__underline__
-~strikethrough~
-*bold _italic bold ~italic bold strikethrough~ __underline italic bold___ bold*
-[inline URL](http://www.example.com/)
-[inline mention of a user](tg://user?id=123456789)
-`inline fixed-width code`
-```
-pre-formatted fixed-width code block
-```
-```python
-pre-formatted fixed-width code block written in the Python programming language
-```
-*/
+function getRandomBackgroundImage() {
+    return 'https://data.whicdn.com/images/259803969/original.gif';
+}
+bot.launch();
