@@ -14,11 +14,11 @@ getAllCoingeckoCoins().then(data => {
 });
 
 const COMMANDS = {
-    price: new RegExp(/^\/va /), //>> "/va btc"
+    price1: new RegExp(/^\/va /), //>> "/va btc"
     chart: new RegExp(/^\/chart /), // >> "/chart btc"
 }
 
-bot.hears(COMMANDS.price, (ctx) => {
+bot.hears(COMMANDS.price1, (ctx) => {
     const fullCommand = ctx.update.message.text;
     const arguments = fullCommand.split(' ').map(ele => ele.trim());
     if (!arguments || !arguments.length || arguments.length < 2 || !arguments[1]) {
