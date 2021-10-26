@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/severusKen/fancy-crypto-price-telegram-bot#readme",
   "dependencies": {
+    "node-fetch": "^3.0.0",
     "telegraf": "^3.38.0"
   }
 }
