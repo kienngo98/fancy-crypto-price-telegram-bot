@@ -1,0 +1,25 @@
+{
+  "name": "fancy-crypto-price-telegram-bot",
+  "version": "1.0.0",
+  "description": "con cac",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm run"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/severusKen/fancy-crypto-price-telegram-bot.git"
+  },
+  "keywords": [
+    "vananh"
+  ],
+  "author": "kien ngo",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/severusKen/fancy-crypto-price-telegram-bot/issues"
+  },
+  "homepage": "https://github.com/severusKen/fancy-crypto-price-telegram-bot#readme",
+  "dependencies": {
+    "telegraf": "^3.38.0"
+  }
+}
