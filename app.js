@@ -44,7 +44,7 @@ bot.hears(COMMANDS.compare, (ctx) => {
     console.log('comapre symbol: ', coinIds)
     if (!coinIds.length) return;
     const requests = coinIds.map(coinId => getFullDataFromCoinId(coinId));
-    Promise.all(requests).then(data => {
+    Promise.all(requests).then(data => { 
         console.log(data);
         if (!data || !data.length) {
 
@@ -57,7 +57,12 @@ bot.hears(COMMANDS.compare, (ctx) => {
 
 function generateCompareResponse(dataArray) {
     const getSpaces = (minusStr) => {
-        minusStr = minusStr.toString();
+        if (minusStr === null || minusStr === undefined) {
+            minusStr = 'N/A';
+        }
+        else {
+            minusStr = minusStr.toString();
+        }
         const defaultSpacing = 6;
         let spacing = '';
         for (let i = 0; i < defaultSpacing - minusStr.length; i++) spacing += ' ';
@@ -88,7 +93,7 @@ function generateCompareResponse(dataArray) {
 | Symbols  | ${dataArray.map(item => item.symbol.toUpperCase() + getSpaces(item.symbol)).join('|')}
 |----------------------------
 | Price/USD| ${dataArray.map(item => '$' + shortenNum(item.market_data.current_price.usd) + getSpaces('$' + shortenNum(item.market_data.current_price.usd))).join('|')}
-| # Rank   | ${dataArray.map(item => item.market_cap_rank + getSpaces(item.market_cap_rank.toString())).join('|')}
+| # Rank   | ${dataArray.map(item => (item.market_cap_rank) ? item.market_cap_rank + getSpaces(item.market_cap_rank) : 'N/A' + getSpaces(item.market_cap_rank)).join('|')}
 | From ATH | ${dataArray.map(item => shortenNum(item.market_data.ath_change_percentage.usd) + '%' + getSpaces(shortenNum(item.market_data.ath_change_percentage.usd) + '%')).join('|')}
 | From ATL | ${dataArray.map(item => shortenNum(item.market_data.atl_change_percentage.usd) + '%' + getSpaces(shortenNum(item.market_data.atl_change_percentage.usd) + '%')).join('|')}
 | Mktcap   | ${dataArray.map(item => '$' + shortenNum(item.market_data.market_cap.usd) + getSpaces('$' + shortenNum(item.market_data.market_cap.usd))).join('|')}
@@ -101,6 +106,7 @@ function generateCompareResponse(dataArray) {
 | 200D (%) | ${dataArray.map(item => shortenNum(item.market_data.price_change_percentage_200d) + '%' + getSpaces(shortenNum(item.market_data.price_change_percentage_200d) + '%')).join('|')}
 | 1Y (%)   | ${dataArray.map(item => shortenNum(item.market_data.price_change_percentage_1y) + '%' + getSpaces(shortenNum(item.market_data.price_change_percentage_1y) + '%')).join('|')}
 |__________|_________________
+Data display in USD
 Data fetched from Coingecko | VA
 </pre>
     `;
